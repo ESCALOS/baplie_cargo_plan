@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import Graphic from "./components/Graphic.vue";
 import InputExcel from "./components/InputExcel.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import { colors } from "./constants";
+import Legend from "./components/Legend.vue";
 
 // Definir tipos
 interface Container {
@@ -14,6 +16,7 @@ interface Container {
 interface LegendItem {
   letter: string;
   pod: string;
+  color: string; // Color asignado
 }
 
 const containers = ref<Container[]>([]);
@@ -36,23 +39,32 @@ const handleDataProcessed = (data: { containers: any[]; legend: any[] }) => {
   legend.value = data.legend.map((item, index) => ({
     letter: String.fromCharCode(65 + index),
     pod: item.pod,
+    color: colors[index % colors.length], // Asignar color cíclicamente
   }));
 };
+
+// Crear un mapeo de colores basado en la leyenda
+const podColorMap = computed(() => {
+  const map = new Map<string, string>();
+  legend.value.forEach((item) => {
+    map.set(item.letter, item.color);
+  });
+  return map;
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100 p-4">
-    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-      <InputExcel @dataProcessed="handleDataProcessed" />
-      <div v-if="legend.length" class="mt-6">
-        <h2 class="text-xl font-semibold mb-2">Leyenda</h2>
-        <ul class="list-disc pl-6">
-          <li v-for="item in legend" :key="item.letter">
-            {{ item.letter }} | {{ item.pod }}
-          </li>
-        </ul>
+    <div class="mx-auto bg-white shadow-md rounded-lg p-6">
+      <div class="print:hidden">
+        <InputExcel @dataProcessed="handleDataProcessed" />
       </div>
-      <Graphic v-if="containers.length" :containers="containers" />
+      <Legend v-if="legend.length" :legend="legend" />
+      <Graphic
+        v-if="containers.length"
+        :containers="containers"
+        :podColorMap="podColorMap"
+      />
     </div>
   </div>
 </template>
