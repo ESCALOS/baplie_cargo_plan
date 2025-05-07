@@ -14,6 +14,29 @@ const isBaseBay = (bay: number) => bay % 4 === 2;
 
 const formatThreeDigits = (value: number) => value.toString().padStart(3, "0");
 
+// Lista de colores predefinidos (máximo 8 colores)
+const colors = [
+  "#FF5733", // Rojo
+  "#33FF57", // Verde
+  "#3357FF", // Azul
+  "#FF33A1", // Rosa
+  "#FFC300", // Amarillo
+  "#DAF7A6", // Verde claro
+  "#C70039", // Rojo oscuro
+  "#900C3F", // Morado
+];
+
+// Crear un mapeo entre `podLetter` y colores
+const podColorMap = new Map<string, string>();
+let colorIndex = 0;
+
+props.containers.forEach((container) => {
+  if (!podColorMap.has(container.podLetter)) {
+    podColorMap.set(container.podLetter, colors[colorIndex]);
+    colorIndex = (colorIndex + 1) % colors.length; // Ciclar entre los colores
+  }
+});
+
 const groupedBays = props.containers.reduce((acc, container) => {
   const bay = container.bay;
   if (!acc[bay]) acc[bay] = [];
@@ -58,7 +81,6 @@ const groupedData = Object.keys(groupedBays)
       const baseWithoutLetters =
         groupedBays[baseBay]?.map((c) => ({
           ...c,
-          podLetter: "",
         })) ?? [];
       result.push({
         title: `${formatThreeDigits(upperBay)}`,
@@ -78,6 +100,7 @@ const groupedData = Object.keys(groupedBays)
         :bay="bayData.title"
         :maxRow="bayData.maxRow"
         :containers="bayData.containers"
+        :podColorMap="podColorMap"
       />
     </div>
   </div>

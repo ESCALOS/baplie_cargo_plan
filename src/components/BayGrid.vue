@@ -10,6 +10,7 @@ const props = defineProps<{
   bay: string; // Título de la bahía (puede ser "BAHÍA 001/002")
   maxRow: number;
   containers: Container[];
+  podColorMap: Map<string, string>;
 }>();
 
 // Generar las columnas (ROW) con 00 en el centro, pares a la izquierda e impares a la derecha
@@ -69,10 +70,12 @@ const isUpperBay = (bay: string) => {
               v-for="row in rows"
               :key="row"
               class="border border-gray-300 p-2 text-center"
-              :class="{
-                'bg-blue-500 text-white': containers.some(
-                  (container) =>
-                    container.row === row && container.tier === tier
+              :style="{
+                backgroundColor: podColorMap.get(
+                  containers.find(
+                    (container) =>
+                      container.row === row && container.tier === tier
+                  )?.podLetter || ''
                 ),
               }"
             >
