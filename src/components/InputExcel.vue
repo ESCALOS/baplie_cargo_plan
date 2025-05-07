@@ -54,7 +54,7 @@ const processExcelData = (data: any[]) => {
 
     if (bay && rowNumber && tier && pod) {
       containers.push({
-        bay,
+        bay: parseInt(bay),
         row: parseInt(rowNumber),
         tier: parseInt(tier),
         pod,

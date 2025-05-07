@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Container {
-  bay: string; // Número de la bahía a la que pertenece el contenedor
+  bay: number; // Número de la bahía a la que pertenece el contenedor
   row: number;
   tier: number;
   podLetter: string; // Letra del puerto de descarga
@@ -35,11 +35,17 @@ const tiers = [
 
 // Formatear los valores de ROW y TIER para que tengan dos dígitos
 const formatTwoDigits = (value: number) => value.toString().padStart(2, "0");
+
+// Saber si es una bahia 4N+3
+const isUpperBay = (bay: string) => {
+  const baseBay = parseInt(bay.split("/")[0]);
+  return baseBay % 4 === 3; // Bahías 4N+3
+};
 </script>
 
 <template>
   <div class="mb-8">
-    <h2 class="text-lg font-bold mb-4">{{ bay }}</h2>
+    <h2 class="text-lg font-bold mb-4 text-center">{{ bay }}</h2>
     <div class="overflow-auto">
       <table class="table-auto border-collapse border border-gray-300">
         <thead>
@@ -80,10 +86,19 @@ const formatTwoDigits = (value: number) => value.toString().padStart(2, "0");
                 "
               >
                 {{
-                  containers.find(
-                    (container) =>
-                      container.row === row && container.tier === tier
-                  )?.podLetter
+                  (() => {
+                    const container = containers.find(
+                      (c) => c.row === row && c.tier === tier
+                    );
+                    if (!container) return "";
+                    if (
+                      isUpperBay(props.bay) &&
+                      (container.bay - 2) % 4 === 0
+                    ) {
+                      return ""; // Es un contenedor de 4N+2 dentro de una bahía 4N+3, no mostrar letra
+                    }
+                    return container.podLetter;
+                  })()
                 }}
               </span>
             </td>

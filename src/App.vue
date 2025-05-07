@@ -5,7 +5,7 @@ import { ref } from "vue";
 
 // Definir tipos
 interface Container {
-  bay: string;
+  bay: number;
   row: number;
   tier: number;
   podLetter: string; // Letra del puerto de descarga

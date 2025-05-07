@@ -1,90 +1,74 @@
 <script setup lang="ts">
 import BayGrid from "./BayGrid.vue";
 
-// Definir el tipo Container con la propiedad podLetter
 interface Container {
-  bay: string;
+  bay: number;
   row: number;
   tier: number;
-  podLetter: string; // Letra del puerto de descarga
+  podLetter: string;
 }
 
-// Definir las props que recibe el componente
 const props = defineProps<{ containers: Container[] }>();
 
-// Identificar las bahías base (4xN + 2)
-const isBaseBay = (bay: number) => (bay - 2) % 4 === 0;
+const isBaseBay = (bay: number) => bay % 4 === 2;
 
-// Agrupar contenedores por bahías relacionadas
+const formatThreeDigits = (value: number) => value.toString().padStart(3, "0");
+
 const groupedBays = props.containers.reduce((acc, container) => {
-  const bayNumber = parseInt(container.bay, 10);
-
-  // Determinar la bahía base
-  const baseBay = isBaseBay(bayNumber)
-    ? bayNumber
-    : Math.floor(bayNumber / 4) * 4 + 2;
-
-  // Agrupar por bahía base
-  if (!acc[baseBay]) {
-    acc[baseBay] = [];
-  }
-  acc[baseBay].push(container);
-
+  const bay = container.bay;
+  if (!acc[bay]) acc[bay] = [];
+  acc[bay].push(container);
   return acc;
 }, {} as Record<number, Container[]>);
 
-// Crear datos agrupados para renderizar
-const groupedData = Object.entries(groupedBays).flatMap(
-  ([baseBay, containers]) => {
-    const baseBayNumber = parseInt(baseBay, 10);
-    const hasLowerBay = containers.some(
-      (container) => parseInt(container.bay, 10) === baseBayNumber - 1
-    );
-    const hasUpperBay = containers.some(
-      (container) => parseInt(container.bay, 10) === baseBayNumber + 1
+const groupedData = Object.keys(groupedBays)
+  .map(Number)
+  .filter(isBaseBay)
+  .flatMap((baseBay) => {
+    const lowerBay = baseBay - 1; // 4N+1
+    const upperBay = baseBay + 1; // 4N+3
+
+    const hasLowerBay = groupedBays[lowerBay];
+    const hasBaseBay = groupedBays[baseBay];
+    const hasUpperBay = groupedBays[upperBay];
+
+    const maxRow = Math.max(
+      ...(groupedBays[lowerBay]?.map((c) => c.row) ?? []),
+      ...(groupedBays[baseBay]?.map((c) => c.row) ?? []),
+      ...(groupedBays[upperBay]?.map((c) => c.row) ?? [])
     );
 
     const result = [];
 
-    // Gráfico para la bahía base y la bahía menor
-    if (hasLowerBay) {
+    if (hasLowerBay && hasBaseBay) {
       result.push({
-        title: `BAHÍA ${baseBayNumber - 1}/${baseBayNumber}`,
-        containers: containers.filter(
-          (container) =>
-            parseInt(container.bay, 10) === baseBayNumber - 1 ||
-            parseInt(container.bay, 10) === baseBayNumber
-        ),
-        maxRow: Math.max(...containers.map((c) => c.row)),
+        title: `${formatThreeDigits(lowerBay)} / ${formatThreeDigits(baseBay)}`,
+        containers: [...groupedBays[lowerBay], ...groupedBays[baseBay]],
+        maxRow,
       });
-    } else {
+    } else if (hasBaseBay) {
       result.push({
-        title: `BAHÍA ${baseBayNumber}`,
-        containers: containers.filter(
-          (container) => parseInt(container.bay, 10) === baseBayNumber
-        ),
-        maxRow: Math.max(...containers.map((c) => c.row)),
+        title: `${formatThreeDigits(baseBay)}`,
+        containers: [...groupedBays[baseBay]],
+        maxRow,
       });
     }
 
-    // Gráfico para la bahía mayor
     if (hasUpperBay) {
+      const baseWithoutLetters =
+        groupedBays[baseBay]?.map((c) => ({
+          ...c,
+          podLetter: "",
+        })) ?? [];
       result.push({
-        title: `BAHÍA ${baseBayNumber + 1}`,
-        containers: containers.map((container) => ({
-          ...container,
-          podLetter:
-            parseInt(container.bay, 10) === baseBayNumber + 1
-              ? container.podLetter
-              : "", // Eliminar letras para la bahía base
-        })),
-        maxRow: Math.max(...containers.map((c) => c.row)),
+        title: `${formatThreeDigits(upperBay)}`,
+        containers: [...baseWithoutLetters, ...groupedBays[upperBay]],
+        maxRow,
       });
     }
 
     return result;
-  }
-);
+  });
 </script>
 
 <template>
