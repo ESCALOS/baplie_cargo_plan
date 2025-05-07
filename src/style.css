@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@media print {
+  /* Forzar colores de fondo en la impresión */
+  td {
+    -webkit-print-color-adjust: exact; /* Para navegadores basados en WebKit */
+    print-color-adjust: exact; /* Estándar */
+  }
+
+  th {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  div {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

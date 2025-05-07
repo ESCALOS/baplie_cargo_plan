@@ -3,7 +3,6 @@ import Graphic from "./components/Graphic.vue";
 import InputExcel from "./components/InputExcel.vue";
 import { computed, ref } from "vue";
 import { colors } from "./constants";
-import Legend from "./components/Legend.vue";
 
 // Definir tipos
 interface Container {
@@ -59,11 +58,11 @@ const podColorMap = computed(() => {
       <div class="print:hidden">
         <InputExcel @dataProcessed="handleDataProcessed" />
       </div>
-      <Legend v-if="legend.length" :legend="legend" />
       <Graphic
         v-if="containers.length"
         :containers="containers"
         :podColorMap="podColorMap"
+        :legend="legend"
       />
     </div>
   </div>

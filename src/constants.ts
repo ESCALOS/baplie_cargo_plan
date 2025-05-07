@@ -9,6 +9,6 @@ export const colors = [
   "#D9B3FF", // Lila claro
   "#B3FFFF", // Turquesa claro
   "#FFD9B3", // Naranja pastel
-  "#A1A1A1", // Verde menta
+  "#CCFFB3", // Verde menta
   "#FFB3FF", // Magenta claro
 ];

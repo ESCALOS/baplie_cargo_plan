@@ -11,7 +11,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div v-if="props.legend.length" class="my-6">
+  <div v-if="props.legend.length" class="my-6 col-span-4">
     <h2 class="text-xl font-semibold mb-4">Leyenda</h2>
     <div class="flex flex-wrap gap-4">
       <div

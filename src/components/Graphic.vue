@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BayGrid from "./BayGrid.vue";
+import Legend from "./Legend.vue";
 
 interface Container {
   bay: number;
@@ -11,6 +12,11 @@ interface Container {
 const props = defineProps<{
   containers: Container[];
   podColorMap: Map<string, string>;
+  legend: {
+    letter: string;
+    pod: string;
+    color: string;
+  }[];
 }>();
 
 const isBaseBay = (bay: number) => bay % 4 === 2;
@@ -74,14 +80,24 @@ const groupedData = Object.keys(groupedBays)
 </script>
 
 <template>
-  <div class="grid grid-cols-4 gap-4">
-    <div v-for="bayData in groupedData" :key="bayData.title">
-      <BayGrid
-        :bay="bayData.title"
-        :maxRow="bayData.maxRow"
-        :containers="bayData.containers"
-        :podColorMap="podColorMap"
-      />
+  <div>
+    <div class="grid grid-cols-4 gap-4">
+      <template v-for="(bayData, index) in groupedData" :key="bayData.title">
+        <!-- Mostrar la leyenda cada 8 bahías -->
+        <Legend
+          v-if="index % 8 === 0"
+          :legend="legend"
+          class="col-span-4 mb-4"
+        />
+        <div>
+          <BayGrid
+            :bay="bayData.title"
+            :maxRow="bayData.maxRow"
+            :containers="bayData.containers"
+            :podColorMap="podColorMap"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>
