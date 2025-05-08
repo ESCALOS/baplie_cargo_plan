@@ -95,7 +95,7 @@ const groupedDataByPage = computed(() => {
           <!-- Leyenda para cada grupo -->
           <Legend :legend="legend" class="col-span-4 mb-4" />
           <!-- Bahías dentro del grupo -->
-          <template v-for="(bayData, index) in group" :key="bayData.title">
+          <template v-for="bayData in group" :key="bayData.title">
             <div>
               <BayGrid
                 :bay="bayData.title"
