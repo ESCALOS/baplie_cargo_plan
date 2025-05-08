@@ -21,6 +21,10 @@ interface LegendItem {
 const containers = ref<Container[]>([]);
 const legend = ref<LegendItem[]>([]);
 
+const handlePrint = () => {
+  window.print();
+};
+
 const handleDataProcessed = (data: { containers: any[]; legend: any[] }) => {
   // Crear un mapeo de POD a letras
   const podToLetterMap: Record<string, string> = {};
@@ -53,17 +57,24 @@ const podColorMap = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 p-4">
-    <div class="mx-auto bg-white shadow-md rounded-lg p-6">
-      <div class="print:hidden">
-        <InputExcel @dataProcessed="handleDataProcessed" />
-      </div>
-      <Graphic
+  <div class="min-h-screen bg-white not-print:p-4">
+    <div class="print:hidden mb-2">
+      <InputExcel @dataProcessed="handleDataProcessed" />
+
+      <!-- Botón de imprimir -->
+      <button
         v-if="containers.length"
-        :containers="containers"
-        :podColorMap="podColorMap"
-        :legend="legend"
-      />
+        @click="handlePrint"
+        class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 print:hidden"
+      >
+        Imprimir
+      </button>
     </div>
+    <Graphic
+      v-if="containers.length"
+      :containers="containers"
+      :podColorMap="podColorMap"
+      :legend="legend"
+    />
   </div>
 </template>

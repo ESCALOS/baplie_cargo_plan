@@ -31,7 +31,7 @@ const rows = Array.from({ length: props.maxRow + 1 }, (_, i) => i)
 // Generar las filas (TIER)
 const tiers = [
   ...Array.from({ length: 13 }, (_, i) => 96 - i * 2), // Parte superior (96 al 72)
-  ...Array.from({ length: 12 }, (_, i) => 22 - i * 2), // Parte inferior (22 al 02)
+  ...Array.from({ length: 11 }, (_, i) => 22 - i * 2), // Parte inferior (22 al 02)
 ];
 
 // Formatear los valores de ROW y TIER para que tengan dos dígitos

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BayGrid from "./BayGrid.vue";
 import Legend from "./Legend.vue";
+import { computed } from "vue";
 
 interface Container {
   bay: number;
@@ -41,12 +42,7 @@ const groupedData = Object.keys(groupedBays)
     const hasBaseBay = groupedBays[baseBay];
     const hasUpperBay = groupedBays[upperBay];
 
-    const maxRow = Math.max(
-      ...(groupedBays[lowerBay]?.map((c) => c.row) ?? []),
-      ...(groupedBays[baseBay]?.map((c) => c.row) ?? []),
-      ...(groupedBays[upperBay]?.map((c) => c.row) ?? [])
-    );
-
+    const maxRow = 20;
     const result = [];
 
     if (hasLowerBay && hasBaseBay) {
@@ -77,27 +73,40 @@ const groupedData = Object.keys(groupedBays)
 
     return result;
   });
+
+const groupedDataByPage = computed(() => {
+  const groups = [];
+  for (let i = 0; i < groupedData.length; i += 8) {
+    groups.push(groupedData.slice(i, i + 8)); // Agrupa de 8 en 8
+  }
+  return groups;
+});
 </script>
 
 <template>
   <div>
-    <div class="grid grid-cols-4 gap-4">
-      <template v-for="(bayData, index) in groupedData" :key="bayData.title">
-        <!-- Mostrar la leyenda cada 8 bahías -->
-        <Legend
-          v-if="index % 8 === 0"
-          :legend="legend"
-          class="col-span-4 mb-4"
-        />
-        <div>
-          <BayGrid
-            :bay="bayData.title"
-            :maxRow="bayData.maxRow"
-            :containers="bayData.containers"
-            :podColorMap="podColorMap"
-          />
+    <template
+      v-for="(group, groupIndex) in groupedDataByPage"
+      :key="groupIndex"
+    >
+      <!-- Contenedor para cada hoja A4 -->
+      <div class="a4-container">
+        <div class="grid grid-cols-4 gap-2">
+          <!-- Leyenda para cada grupo -->
+          <Legend :legend="legend" class="col-span-4 mb-4" />
+          <!-- Bahías dentro del grupo -->
+          <template v-for="(bayData, index) in group" :key="bayData.title">
+            <div>
+              <BayGrid
+                :bay="bayData.title"
+                :maxRow="bayData.maxRow"
+                :containers="bayData.containers"
+                :podColorMap="podColorMap"
+              />
+            </div>
+          </template>
         </div>
-      </template>
-    </div>
+      </div>
+    </template>
   </div>
 </template>
